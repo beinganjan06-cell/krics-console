@@ -16,7 +16,7 @@ function rnd(): number {
   return seed / 4294967296;
 }
 function pick<T>(items: T[]): T {
-  return items[Math.floor(rnd() * items.length)];
+  return items[Math.floor(rnd() * items.length)] as T;
 }
 function int(min: number, max: number): number {
   return Math.floor(min + rnd() * (max - min + 1));
