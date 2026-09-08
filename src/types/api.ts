@@ -29,4 +29,30 @@ export interface ListParams extends QueryParams {
   page_size?: number;
   search?: string;
   ordering?: string;
+  // master filters
+  is_active?: boolean | string;
+  division?: string | number;
+  district?: string | number;
+  taluk?: string | number;
+  // institution filters
+  institution_type?: string;
+  category?: string;
+  site_status?: string;
+  academic_year?: string;
+  // work filters
+  status?: string;
+  scheme?: string;
+  agency?: string;
+  kkrdb?: boolean | string;
+  progress_min?: number | string;
+  progress_max?: number | string;
+  date_from?: string;
+  date_to?: string;
+  // report filters
+  group_by?: string;
+  fields?: string;
+  format?: string;
+  // import filters
+  entity_type?: string;
+  row_number?: number | string;
 }

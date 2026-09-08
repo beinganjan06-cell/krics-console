@@ -1,18 +1,32 @@
 import type { WorkStatusKey } from "./works";
 
+export type DashboardTotalKey =
+  | "institutions"
+  | "residential_schools"
+  | "hostels"
+  | "pu_colleges"
+  | "works"
+  | "ongoing_works"
+  | "completed_works"
+  | "site_problem_records";
+
+export interface DashboardKpiMetric {
+  key: DashboardTotalKey;
+  label: string;
+  value: number;
+}
+
+export interface DashboardSiteCard {
+  status: "available" | "not_available" | "problem";
+  label: string;
+  count: number;
+}
+
 export interface DashboardSummary {
-  totals: {
-    institutions: number;
-    residential_schools: number;
-    hostels: number;
-    pu_colleges: number;
-    works: number;
-    ongoing_works: number;
-    completed_works: number;
-    site_problem_records: number;
-  };
-  previous_period: Partial<Record<keyof DashboardSummary["totals"], number>>;
-  work_status_distribution: { status: WorkStatusKey; count: number }[];
+  kpi_metrics?: DashboardKpiMetric[];
+  totals: Record<DashboardTotalKey, number>;
+  previous_period: Partial<Record<DashboardTotalKey, number>>;
+  work_status_distribution: { status: WorkStatusKey; label?: string; count: number }[];
   district_works: { district: string; works: number }[];
   progress_by_district: { district: string; financial_lakh: number; physical_pct: number }[];
   recent_works: {
@@ -24,6 +38,7 @@ export interface DashboardSummary {
     updated_at: string | null;
   }[];
   site_snapshot: { available: number; not_available: number; problem: number };
+  site_cards?: DashboardSiteCard[];
 }
 
 export interface WorksSummaryReport {
@@ -73,3 +88,56 @@ export interface InstitutionCoverageReport {
   site: { available: number; not_available: number; problem: number };
   districts: { district: string; institutions: number; taluks: number; hoblis: number }[];
 }
+
+export type ReportSlug =
+  | "works-summary"
+  | "district-summary"
+  | "category-summary"
+  | "financial-progress"
+  | "physical-progress"
+  | "institution-coverage";
+
+export interface ReportColumn {
+  key: string;
+  label: string;
+  label_kn: string;
+  type: "text" | "number" | "percent" | "date";
+  export?: boolean;
+}
+
+export interface ReportGroupOption {
+  value: string;
+  label: string;
+  label_kn: string;
+}
+
+export interface ReportResponse {
+  slug: ReportSlug | string;
+  title: string;
+  title_kn: string;
+  subtitle: string;
+  subtitle_kn?: string;
+  generated_at: string;
+  group_by: string;
+  group_by_options: ReportGroupOption[];
+  filters_applied: { label: string; value: string }[];
+  available_fields: ReportColumn[];
+  columns: ReportColumn[];
+  rows: Record<string, string | number | null>[];
+  totals: Record<string, string | number | null>;
+  row_count: number;
+  by_status?: { status: WorkStatusKey; label?: string; count: number }[];
+  buckets?: { bucket: string; count: number }[];
+  by_type?: { type: string; count: number }[];
+  site?: { available: number; not_available: number; problem: number };
+}
+
+export const REPORT_SLUGS: ReportSlug[] = [
+  "works-summary",
+  "district-summary",
+  "category-summary",
+  "financial-progress",
+  "physical-progress",
+  "institution-coverage",
+];
+

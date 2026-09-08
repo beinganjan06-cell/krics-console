@@ -1,12 +1,19 @@
+import { isNotFound, isRedirect } from "@tanstack/react-router";
 import { createStart, createCsrfMiddleware, createMiddleware } from "@tanstack/react-start";
 
 import { renderErrorPage } from "./lib/error-page";
+
+function isFrameworkControlFlow(error: unknown): boolean {
+  return isRedirect(error) || isNotFound(error) || error instanceof Response;
+}
 
 const errorMiddleware = createMiddleware().server(async ({ next }) => {
   try {
     return await next();
   } catch (error) {
-    if (error != null && typeof error === "object" && "statusCode" in error) {
+    // Redirects are Response objects (status 307) — they must not be turned into
+    // the generic HTML error page or `/` never reaches /dashboard.
+    if (isFrameworkControlFlow(error) || (error != null && typeof error === "object" && "statusCode" in error)) {
       throw error;
     }
     console.error(error);

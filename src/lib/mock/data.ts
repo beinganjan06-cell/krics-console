@@ -66,7 +66,7 @@ function taluksFor(district: string): string[] {
   return [`${district} North`, `${district} South`, `${district} Rural`];
 }
 
-function makeMasters(): Record<MasterResource, MasterRecord[]> {
+function makeMasters(): Record<Exclude<MasterResource, "caste-categories">, MasterRecord[]> {
   const mk = (names: string[], prefix: string): MasterRecord[] =>
     names.map((name, i) => ({
       id: i + 1,
@@ -161,6 +161,7 @@ function makeInstitutions(): Institution[] {
       constituency: `${district} ${i % 2 ? "City" : "Rural"}`,
       hobli: `${taluk} Hobli`,
       academic_year: pick(YEARS),
+      is_active: true,
       site_status: status,
       site_details:
         status === "problem"
@@ -230,6 +231,7 @@ function makeWorks(institutions: Institution[]): Work[] {
       scheme: pick(SCHEMES),
       agency: pick(AGENCIES),
       status,
+      is_active: true,
       is_kkrdb: rnd() > 0.75,
       estimate_amount: estimate,
       contract_amount: contract,

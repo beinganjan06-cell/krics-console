@@ -10,33 +10,391 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SplatRouteImport } from './routes/$'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as AdministrationMenusRouteImport } from './routes/administration/menus'
+import { Route as AdministrationRolesRouteImport } from './routes/administration/roles'
+import { Route as AdministrationSettingsRouteImport } from './routes/administration/settings'
+import { Route as AdministrationUsersRouteImport } from './routes/administration/users'
+import { Route as ImportsAuditRouteImport } from './routes/imports/audit'
+import { Route as ImportsBatchesRouteImport } from './routes/imports/batches'
+import { Route as InstitutionsIndexRouteImport } from './routes/institutions/index'
+import { Route as InstitutionsCollegesRouteImport } from './routes/institutions/colleges'
+import { Route as InstitutionsHostelsRouteImport } from './routes/institutions/hostels'
+import { Route as InstitutionsSchoolsRouteImport } from './routes/institutions/schools'
+import { Route as MastersResourceRouteImport } from './routes/masters/$resource'
+import { Route as ReportsSlugRouteImport } from './routes/reports/$slug'
+import { Route as WorksIndexRouteImport } from './routes/works/index'
+import { Route as WorksCompletedRouteImport } from './routes/works/completed'
+import { Route as WorksEstimateStageRouteImport } from './routes/works/estimate-stage'
+import { Route as WorksKkrdbRouteImport } from './routes/works/kkrdb'
+import { Route as WorksOngoingRouteImport } from './routes/works/ongoing'
+import { Route as WorksSiteProblemsRouteImport } from './routes/works/site-problems'
+import { Route as WorksTenderStageRouteImport } from './routes/works/tender-stage'
+import { Route as InstitutionsSitesIndexRouteImport } from './routes/institutions/sites/index'
+import { Route as InstitutionsSitesAvailableRouteImport } from './routes/institutions/sites/available'
+import { Route as InstitutionsSitesNotAvailableRouteImport } from './routes/institutions/sites/not-available'
+import { Route as InstitutionsSitesProblemsRouteImport } from './routes/institutions/sites/problems'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SplatRoute = SplatRouteImport.update({
+  id: '/$',
+  path: '/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdministrationMenusRoute = AdministrationMenusRouteImport.update({
+  id: '/administration/menus',
+  path: '/administration/menus',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdministrationRolesRoute = AdministrationRolesRouteImport.update({
+  id: '/administration/roles',
+  path: '/administration/roles',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdministrationSettingsRoute = AdministrationSettingsRouteImport.update({
+  id: '/administration/settings',
+  path: '/administration/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdministrationUsersRoute = AdministrationUsersRouteImport.update({
+  id: '/administration/users',
+  path: '/administration/users',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ImportsAuditRoute = ImportsAuditRouteImport.update({
+  id: '/imports/audit',
+  path: '/imports/audit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ImportsBatchesRoute = ImportsBatchesRouteImport.update({
+  id: '/imports/batches',
+  path: '/imports/batches',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InstitutionsIndexRoute = InstitutionsIndexRouteImport.update({
+  id: '/institutions/',
+  path: '/institutions/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InstitutionsCollegesRoute = InstitutionsCollegesRouteImport.update({
+  id: '/institutions/colleges',
+  path: '/institutions/colleges',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InstitutionsHostelsRoute = InstitutionsHostelsRouteImport.update({
+  id: '/institutions/hostels',
+  path: '/institutions/hostels',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InstitutionsSchoolsRoute = InstitutionsSchoolsRouteImport.update({
+  id: '/institutions/schools',
+  path: '/institutions/schools',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MastersResourceRoute = MastersResourceRouteImport.update({
+  id: '/masters/$resource',
+  path: '/masters/$resource',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReportsSlugRoute = ReportsSlugRouteImport.update({
+  id: '/reports/$slug',
+  path: '/reports/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WorksIndexRoute = WorksIndexRouteImport.update({
+  id: '/works/',
+  path: '/works/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WorksCompletedRoute = WorksCompletedRouteImport.update({
+  id: '/works/completed',
+  path: '/works/completed',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WorksEstimateStageRoute = WorksEstimateStageRouteImport.update({
+  id: '/works/estimate-stage',
+  path: '/works/estimate-stage',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WorksKkrdbRoute = WorksKkrdbRouteImport.update({
+  id: '/works/kkrdb',
+  path: '/works/kkrdb',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WorksOngoingRoute = WorksOngoingRouteImport.update({
+  id: '/works/ongoing',
+  path: '/works/ongoing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WorksSiteProblemsRoute = WorksSiteProblemsRouteImport.update({
+  id: '/works/site-problems',
+  path: '/works/site-problems',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WorksTenderStageRoute = WorksTenderStageRouteImport.update({
+  id: '/works/tender-stage',
+  path: '/works/tender-stage',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InstitutionsSitesIndexRoute = InstitutionsSitesIndexRouteImport.update({
+  id: '/institutions/sites/',
+  path: '/institutions/sites/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InstitutionsSitesAvailableRoute =
+  InstitutionsSitesAvailableRouteImport.update({
+    id: '/institutions/sites/available',
+    path: '/institutions/sites/available',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const InstitutionsSitesNotAvailableRoute =
+  InstitutionsSitesNotAvailableRouteImport.update({
+    id: '/institutions/sites/not-available',
+    path: '/institutions/sites/not-available',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const InstitutionsSitesProblemsRoute =
+  InstitutionsSitesProblemsRouteImport.update({
+    id: '/institutions/sites/problems',
+    path: '/institutions/sites/problems',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/$': typeof SplatRoute
+  '/dashboard': typeof DashboardRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/login': typeof LoginRoute
+  '/administration/menus': typeof AdministrationMenusRoute
+  '/administration/roles': typeof AdministrationRolesRoute
+  '/administration/settings': typeof AdministrationSettingsRoute
+  '/administration/users': typeof AdministrationUsersRoute
+  '/imports/audit': typeof ImportsAuditRoute
+  '/imports/batches': typeof ImportsBatchesRoute
+  '/institutions/colleges': typeof InstitutionsCollegesRoute
+  '/institutions/hostels': typeof InstitutionsHostelsRoute
+  '/institutions/schools': typeof InstitutionsSchoolsRoute
+  '/masters/$resource': typeof MastersResourceRoute
+  '/reports/$slug': typeof ReportsSlugRoute
+  '/works/completed': typeof WorksCompletedRoute
+  '/works/estimate-stage': typeof WorksEstimateStageRoute
+  '/works/kkrdb': typeof WorksKkrdbRoute
+  '/works/ongoing': typeof WorksOngoingRoute
+  '/works/site-problems': typeof WorksSiteProblemsRoute
+  '/works/tender-stage': typeof WorksTenderStageRoute
+  '/institutions/': typeof InstitutionsIndexRoute
+  '/works/': typeof WorksIndexRoute
+  '/institutions/sites/available': typeof InstitutionsSitesAvailableRoute
+  '/institutions/sites/not-available': typeof InstitutionsSitesNotAvailableRoute
+  '/institutions/sites/problems': typeof InstitutionsSitesProblemsRoute
+  '/institutions/sites/': typeof InstitutionsSitesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/$': typeof SplatRoute
+  '/dashboard': typeof DashboardRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/login': typeof LoginRoute
+  '/administration/menus': typeof AdministrationMenusRoute
+  '/administration/roles': typeof AdministrationRolesRoute
+  '/administration/settings': typeof AdministrationSettingsRoute
+  '/administration/users': typeof AdministrationUsersRoute
+  '/imports/audit': typeof ImportsAuditRoute
+  '/imports/batches': typeof ImportsBatchesRoute
+  '/institutions/colleges': typeof InstitutionsCollegesRoute
+  '/institutions/hostels': typeof InstitutionsHostelsRoute
+  '/institutions/schools': typeof InstitutionsSchoolsRoute
+  '/masters/$resource': typeof MastersResourceRoute
+  '/reports/$slug': typeof ReportsSlugRoute
+  '/works/completed': typeof WorksCompletedRoute
+  '/works/estimate-stage': typeof WorksEstimateStageRoute
+  '/works/kkrdb': typeof WorksKkrdbRoute
+  '/works/ongoing': typeof WorksOngoingRoute
+  '/works/site-problems': typeof WorksSiteProblemsRoute
+  '/works/tender-stage': typeof WorksTenderStageRoute
+  '/institutions': typeof InstitutionsIndexRoute
+  '/works': typeof WorksIndexRoute
+  '/institutions/sites/available': typeof InstitutionsSitesAvailableRoute
+  '/institutions/sites/not-available': typeof InstitutionsSitesNotAvailableRoute
+  '/institutions/sites/problems': typeof InstitutionsSitesProblemsRoute
+  '/institutions/sites': typeof InstitutionsSitesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/$': typeof SplatRoute
+  '/dashboard': typeof DashboardRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/login': typeof LoginRoute
+  '/administration/menus': typeof AdministrationMenusRoute
+  '/administration/roles': typeof AdministrationRolesRoute
+  '/administration/settings': typeof AdministrationSettingsRoute
+  '/administration/users': typeof AdministrationUsersRoute
+  '/imports/audit': typeof ImportsAuditRoute
+  '/imports/batches': typeof ImportsBatchesRoute
+  '/institutions/colleges': typeof InstitutionsCollegesRoute
+  '/institutions/hostels': typeof InstitutionsHostelsRoute
+  '/institutions/schools': typeof InstitutionsSchoolsRoute
+  '/masters/$resource': typeof MastersResourceRoute
+  '/reports/$slug': typeof ReportsSlugRoute
+  '/works/completed': typeof WorksCompletedRoute
+  '/works/estimate-stage': typeof WorksEstimateStageRoute
+  '/works/kkrdb': typeof WorksKkrdbRoute
+  '/works/ongoing': typeof WorksOngoingRoute
+  '/works/site-problems': typeof WorksSiteProblemsRoute
+  '/works/tender-stage': typeof WorksTenderStageRoute
+  '/institutions/': typeof InstitutionsIndexRoute
+  '/works/': typeof WorksIndexRoute
+  '/institutions/sites/available': typeof InstitutionsSitesAvailableRoute
+  '/institutions/sites/not-available': typeof InstitutionsSitesNotAvailableRoute
+  '/institutions/sites/problems': typeof InstitutionsSitesProblemsRoute
+  '/institutions/sites/': typeof InstitutionsSitesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/$'
+    | '/dashboard'
+    | '/forgot-password'
+    | '/login'
+    | '/administration/menus'
+    | '/administration/roles'
+    | '/administration/settings'
+    | '/administration/users'
+    | '/imports/audit'
+    | '/imports/batches'
+    | '/institutions/colleges'
+    | '/institutions/hostels'
+    | '/institutions/schools'
+    | '/masters/$resource'
+    | '/reports/$slug'
+    | '/works/completed'
+    | '/works/estimate-stage'
+    | '/works/kkrdb'
+    | '/works/ongoing'
+    | '/works/site-problems'
+    | '/works/tender-stage'
+    | '/institutions/'
+    | '/works/'
+    | '/institutions/sites/available'
+    | '/institutions/sites/not-available'
+    | '/institutions/sites/problems'
+    | '/institutions/sites/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/$'
+    | '/dashboard'
+    | '/forgot-password'
+    | '/login'
+    | '/administration/menus'
+    | '/administration/roles'
+    | '/administration/settings'
+    | '/administration/users'
+    | '/imports/audit'
+    | '/imports/batches'
+    | '/institutions/colleges'
+    | '/institutions/hostels'
+    | '/institutions/schools'
+    | '/masters/$resource'
+    | '/reports/$slug'
+    | '/works/completed'
+    | '/works/estimate-stage'
+    | '/works/kkrdb'
+    | '/works/ongoing'
+    | '/works/site-problems'
+    | '/works/tender-stage'
+    | '/institutions'
+    | '/works'
+    | '/institutions/sites/available'
+    | '/institutions/sites/not-available'
+    | '/institutions/sites/problems'
+    | '/institutions/sites'
+  id:
+    | '__root__'
+    | '/'
+    | '/$'
+    | '/dashboard'
+    | '/forgot-password'
+    | '/login'
+    | '/administration/menus'
+    | '/administration/roles'
+    | '/administration/settings'
+    | '/administration/users'
+    | '/imports/audit'
+    | '/imports/batches'
+    | '/institutions/colleges'
+    | '/institutions/hostels'
+    | '/institutions/schools'
+    | '/masters/$resource'
+    | '/reports/$slug'
+    | '/works/completed'
+    | '/works/estimate-stage'
+    | '/works/kkrdb'
+    | '/works/ongoing'
+    | '/works/site-problems'
+    | '/works/tender-stage'
+    | '/institutions/'
+    | '/works/'
+    | '/institutions/sites/available'
+    | '/institutions/sites/not-available'
+    | '/institutions/sites/problems'
+    | '/institutions/sites/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  SplatRoute: typeof SplatRoute
+  DashboardRoute: typeof DashboardRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
+  LoginRoute: typeof LoginRoute
+  AdministrationMenusRoute: typeof AdministrationMenusRoute
+  AdministrationRolesRoute: typeof AdministrationRolesRoute
+  AdministrationSettingsRoute: typeof AdministrationSettingsRoute
+  AdministrationUsersRoute: typeof AdministrationUsersRoute
+  ImportsAuditRoute: typeof ImportsAuditRoute
+  ImportsBatchesRoute: typeof ImportsBatchesRoute
+  InstitutionsCollegesRoute: typeof InstitutionsCollegesRoute
+  InstitutionsHostelsRoute: typeof InstitutionsHostelsRoute
+  InstitutionsSchoolsRoute: typeof InstitutionsSchoolsRoute
+  MastersResourceRoute: typeof MastersResourceRoute
+  ReportsSlugRoute: typeof ReportsSlugRoute
+  WorksCompletedRoute: typeof WorksCompletedRoute
+  WorksEstimateStageRoute: typeof WorksEstimateStageRoute
+  WorksKkrdbRoute: typeof WorksKkrdbRoute
+  WorksOngoingRoute: typeof WorksOngoingRoute
+  WorksSiteProblemsRoute: typeof WorksSiteProblemsRoute
+  WorksTenderStageRoute: typeof WorksTenderStageRoute
+  InstitutionsIndexRoute: typeof InstitutionsIndexRoute
+  WorksIndexRoute: typeof WorksIndexRoute
+  InstitutionsSitesAvailableRoute: typeof InstitutionsSitesAvailableRoute
+  InstitutionsSitesNotAvailableRoute: typeof InstitutionsSitesNotAvailableRoute
+  InstitutionsSitesProblemsRoute: typeof InstitutionsSitesProblemsRoute
+  InstitutionsSitesIndexRoute: typeof InstitutionsSitesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +406,227 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$': {
+      id: '/$'
+      path: '/$'
+      fullPath: '/$'
+      preLoaderRoute: typeof SplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/administration/menus': {
+      id: '/administration/menus'
+      path: '/administration/menus'
+      fullPath: '/administration/menus'
+      preLoaderRoute: typeof AdministrationMenusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/administration/roles': {
+      id: '/administration/roles'
+      path: '/administration/roles'
+      fullPath: '/administration/roles'
+      preLoaderRoute: typeof AdministrationRolesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/administration/settings': {
+      id: '/administration/settings'
+      path: '/administration/settings'
+      fullPath: '/administration/settings'
+      preLoaderRoute: typeof AdministrationSettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/administration/users': {
+      id: '/administration/users'
+      path: '/administration/users'
+      fullPath: '/administration/users'
+      preLoaderRoute: typeof AdministrationUsersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/imports/audit': {
+      id: '/imports/audit'
+      path: '/imports/audit'
+      fullPath: '/imports/audit'
+      preLoaderRoute: typeof ImportsAuditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/imports/batches': {
+      id: '/imports/batches'
+      path: '/imports/batches'
+      fullPath: '/imports/batches'
+      preLoaderRoute: typeof ImportsBatchesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/institutions/': {
+      id: '/institutions/'
+      path: '/institutions'
+      fullPath: '/institutions/'
+      preLoaderRoute: typeof InstitutionsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/institutions/colleges': {
+      id: '/institutions/colleges'
+      path: '/institutions/colleges'
+      fullPath: '/institutions/colleges'
+      preLoaderRoute: typeof InstitutionsCollegesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/institutions/hostels': {
+      id: '/institutions/hostels'
+      path: '/institutions/hostels'
+      fullPath: '/institutions/hostels'
+      preLoaderRoute: typeof InstitutionsHostelsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/institutions/schools': {
+      id: '/institutions/schools'
+      path: '/institutions/schools'
+      fullPath: '/institutions/schools'
+      preLoaderRoute: typeof InstitutionsSchoolsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/masters/$resource': {
+      id: '/masters/$resource'
+      path: '/masters/$resource'
+      fullPath: '/masters/$resource'
+      preLoaderRoute: typeof MastersResourceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reports/$slug': {
+      id: '/reports/$slug'
+      path: '/reports/$slug'
+      fullPath: '/reports/$slug'
+      preLoaderRoute: typeof ReportsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/works/': {
+      id: '/works/'
+      path: '/works'
+      fullPath: '/works/'
+      preLoaderRoute: typeof WorksIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/works/completed': {
+      id: '/works/completed'
+      path: '/works/completed'
+      fullPath: '/works/completed'
+      preLoaderRoute: typeof WorksCompletedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/works/estimate-stage': {
+      id: '/works/estimate-stage'
+      path: '/works/estimate-stage'
+      fullPath: '/works/estimate-stage'
+      preLoaderRoute: typeof WorksEstimateStageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/works/kkrdb': {
+      id: '/works/kkrdb'
+      path: '/works/kkrdb'
+      fullPath: '/works/kkrdb'
+      preLoaderRoute: typeof WorksKkrdbRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/works/ongoing': {
+      id: '/works/ongoing'
+      path: '/works/ongoing'
+      fullPath: '/works/ongoing'
+      preLoaderRoute: typeof WorksOngoingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/works/site-problems': {
+      id: '/works/site-problems'
+      path: '/works/site-problems'
+      fullPath: '/works/site-problems'
+      preLoaderRoute: typeof WorksSiteProblemsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/works/tender-stage': {
+      id: '/works/tender-stage'
+      path: '/works/tender-stage'
+      fullPath: '/works/tender-stage'
+      preLoaderRoute: typeof WorksTenderStageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/institutions/sites/': {
+      id: '/institutions/sites/'
+      path: '/institutions/sites'
+      fullPath: '/institutions/sites/'
+      preLoaderRoute: typeof InstitutionsSitesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/institutions/sites/available': {
+      id: '/institutions/sites/available'
+      path: '/institutions/sites/available'
+      fullPath: '/institutions/sites/available'
+      preLoaderRoute: typeof InstitutionsSitesAvailableRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/institutions/sites/not-available': {
+      id: '/institutions/sites/not-available'
+      path: '/institutions/sites/not-available'
+      fullPath: '/institutions/sites/not-available'
+      preLoaderRoute: typeof InstitutionsSitesNotAvailableRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/institutions/sites/problems': {
+      id: '/institutions/sites/problems'
+      path: '/institutions/sites/problems'
+      fullPath: '/institutions/sites/problems'
+      preLoaderRoute: typeof InstitutionsSitesProblemsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  SplatRoute: SplatRoute,
+  DashboardRoute: DashboardRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
+  LoginRoute: LoginRoute,
+  AdministrationMenusRoute: AdministrationMenusRoute,
+  AdministrationRolesRoute: AdministrationRolesRoute,
+  AdministrationSettingsRoute: AdministrationSettingsRoute,
+  AdministrationUsersRoute: AdministrationUsersRoute,
+  ImportsAuditRoute: ImportsAuditRoute,
+  ImportsBatchesRoute: ImportsBatchesRoute,
+  InstitutionsCollegesRoute: InstitutionsCollegesRoute,
+  InstitutionsHostelsRoute: InstitutionsHostelsRoute,
+  InstitutionsSchoolsRoute: InstitutionsSchoolsRoute,
+  MastersResourceRoute: MastersResourceRoute,
+  ReportsSlugRoute: ReportsSlugRoute,
+  WorksCompletedRoute: WorksCompletedRoute,
+  WorksEstimateStageRoute: WorksEstimateStageRoute,
+  WorksKkrdbRoute: WorksKkrdbRoute,
+  WorksOngoingRoute: WorksOngoingRoute,
+  WorksSiteProblemsRoute: WorksSiteProblemsRoute,
+  WorksTenderStageRoute: WorksTenderStageRoute,
+  InstitutionsIndexRoute: InstitutionsIndexRoute,
+  WorksIndexRoute: WorksIndexRoute,
+  InstitutionsSitesAvailableRoute: InstitutionsSitesAvailableRoute,
+  InstitutionsSitesNotAvailableRoute: InstitutionsSitesNotAvailableRoute,
+  InstitutionsSitesProblemsRoute: InstitutionsSitesProblemsRoute,
+  InstitutionsSitesIndexRoute: InstitutionsSitesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

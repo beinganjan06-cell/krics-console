@@ -22,6 +22,8 @@ import type {
 import type { ImportBatch, ImportResult, ImportedRow } from "@/types/imports";
 import type { ApiAdapter } from "@/lib/api/adapter";
 import * as db from "./data";
+import type { LoginResponse } from "@/types/auth";
+import * as accessStore from "./access-store";
 
 const delay = (ms = 320) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -60,12 +62,74 @@ function matches(value: unknown, needle: string): boolean {
 
 const masterStore = db.masters;
 
+function mockMasterKey(resource: MasterResource): Exclude<MasterResource, "caste-categories"> {
+  if (resource === "caste-categories") return "categories";
+  return resource as Exclude<MasterResource, "caste-categories">;
+}
+
 export const mockAdapter: ApiAdapter = {
   mode: "mock",
 
+  async login(payload) {
+    await delay(280);
+    const username = payload.username.trim();
+    const name = username.includes("@")
+      ? username.split("@")[0]!.replace(/[._]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
+      : username;
+    const email = username.includes("@")
+      ? username
+      : username
+        ? `${username.toLowerCase().replace(/\s+/g, ".")}@krics.karnataka.gov.in`
+        : "admin@krics.karnataka.gov.in";
+    return {
+      access: `mock-access-${Date.now()}`,
+      refresh: `mock-refresh-${Date.now()}`,
+      user: {
+        id: 1,
+        name: name || "KRICS User",
+        email,
+        role: "Super Admin",
+        role_code: "SUPER_ADMIN",
+        menus: accessStore.mockMenusForUser(),
+      },
+    } satisfies LoginResponse;
+  },
+
+  async logout() {
+    await delay(180);
+  },
+
+  async getMe() {
+    await delay(120);
+    return {
+      id: 1,
+      name: "KRICS User",
+      email: "admin@krics.karnataka.gov.in",
+      role: "Super Admin",
+      role_code: "SUPER_ADMIN",
+      menus: accessStore.mockMenusForUser(),
+    };
+  },
+
+  async requestPasswordReset(payload) {
+    await delay(520);
+    const email = payload.email.trim();
+    if (!email) {
+      throw new ApiError("Please enter your registered email address.", 400, {
+        email: ["Email address is required."],
+      });
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      throw new ApiError("Enter a valid email address.", 400, {
+        email: ["Enter a valid email address."],
+      });
+    }
+    return { accepted: true };
+  },
+
   async listMasters(resource, params) {
     await delay(220);
-    let rows = [...(masterStore[resource] ?? [])];
+    let rows = [...(masterStore[mockMasterKey(resource)] ?? [])];
     if (params.search) {
       const q = String(params.search);
       rows = rows.filter((r) => matches(r.name, q) || matches(r.code, q));
@@ -75,17 +139,33 @@ export const mockAdapter: ApiAdapter = {
       rows = rows.filter((r) => r.is_active === active);
     }
     if (params.district) rows = rows.filter((r) => String(r.district) === String(params.district));
+    if (params.division) rows = rows.filter((r) => String(r.division) === String(params.division));
     return paginate(sortRows(rows as unknown as Record<string, unknown>[], params.ordering) as unknown as MasterRecord[], params);
   },
 
   async createMaster(resource, payload) {
     await delay(400);
-    const rows = masterStore[resource];
-    if (rows.some((r) => r.name.toLowerCase() === payload.name.toLowerCase())) {
+    const rows = masterStore[mockMasterKey(resource)];
+    if (rows.some((r) => r.name.toLowerCase() === payload.name.toLowerCase() && r.is_active)) {
       throw new ApiError("Validation failed.", 400, {
         name: ["A record with this name already exists."],
       });
     }
+    const inactive = rows.find((r) => r.name.toLowerCase() === payload.name.toLowerCase() && !r.is_active);
+    if (inactive) {
+      const restored: MasterRecord = {
+        ...inactive,
+        ...payload,
+        is_active: true,
+        updated_at: new Date().toISOString(),
+      };
+      const index = rows.findIndex((r) => r.id === inactive.id);
+      rows[index] = restored;
+      return restored;
+    }
+    const parentDivision = payload.division
+      ? masterStore.divisions.find((d) => d.id === payload.division)
+      : undefined;
     const parentDistrict = payload.district
       ? masterStore.districts.find((d) => d.id === payload.district)
       : undefined;
@@ -97,6 +177,8 @@ export const mockAdapter: ApiAdapter = {
       name: payload.name,
       code: payload.code ?? null,
       is_active: payload.is_active,
+      division: payload.division ?? null,
+      division_name: parentDivision?.name ?? null,
       district: payload.district ?? parentTaluk?.district ?? null,
       district_name: parentDistrict?.name ?? parentTaluk?.district_name ?? null,
       taluk: payload.taluk ?? null,
@@ -109,11 +191,21 @@ export const mockAdapter: ApiAdapter = {
     return record;
   },
 
+  async getMaster(resource, id) {
+    await delay(180);
+    const record = masterStore[mockMasterKey(resource)]?.find((r) => r.id === id);
+    if (!record) throw new ApiError("Record not found.", 404);
+    return record;
+  },
+
   async updateMaster(resource, id, payload) {
     await delay(380);
-    const rows = masterStore[resource];
+    const rows = masterStore[mockMasterKey(resource)];
     const index = rows.findIndex((r) => r.id === id);
     if (index < 0) throw new ApiError("Record not found.", 404);
+    const parentDivision = payload.division
+      ? masterStore.divisions.find((d) => d.id === payload.division)
+      : undefined;
     const parentDistrict = payload.district
       ? masterStore.districts.find((d) => d.id === payload.district)
       : undefined;
@@ -123,6 +215,7 @@ export const mockAdapter: ApiAdapter = {
     const updated: MasterRecord = {
       ...(rows[index] as MasterRecord),
       ...payload,
+      division_name: parentDivision?.name ?? rows[index]?.division_name ?? null,
       district_name: parentDistrict?.name ?? parentTaluk?.district_name ?? rows[index]?.district_name ?? null,
       taluk_name: parentTaluk?.name ?? rows[index]?.taluk_name ?? null,
       updated_at: new Date().toISOString(),
@@ -133,16 +226,11 @@ export const mockAdapter: ApiAdapter = {
 
   async deleteMaster(resource, id) {
     await delay(320);
-    const rows = masterStore[resource];
+    const rows = masterStore[mockMasterKey(resource)];
     const record = rows.find((r) => r.id === id);
     if (!record) throw new ApiError("Record not found.", 404);
-    if ((record.reference_count ?? 0) > 0) {
-      throw new ApiError(
-        `This record is referenced by ${record.reference_count} other records and cannot be deleted.`,
-        409,
-      );
-    }
-    masterStore[resource] = rows.filter((r) => r.id !== id);
+    record.is_active = false;
+    record.updated_at = new Date().toISOString();
   },
 
   async listInstitutions(params) {
@@ -151,6 +239,10 @@ export const mockAdapter: ApiAdapter = {
     if (params.search) {
       const q = String(params.search);
       rows = rows.filter((r) => matches(r.name, q) || matches(r.code, q));
+    }
+    if (params.is_active !== undefined && params.is_active !== "") {
+      const active = String(params.is_active) === "true";
+      rows = rows.filter((r) => (r.is_active !== false) === active);
     }
     (
       ["institution_type", "category", "district", "taluk", "site_status", "academic_year"] as const
@@ -169,6 +261,62 @@ export const mockAdapter: ApiAdapter = {
     const found = db.institutions.find((i) => i.id === id);
     if (!found) throw new ApiError("Institution not found.", 404);
     return found;
+  },
+
+  async createInstitution(payload) {
+    await delay(380);
+    const record = {
+      id: Math.max(0, ...db.institutions.map((i) => i.id)) + 1,
+      code: payload.code || `KRICS/${String(db.institutions.length + 1).padStart(4, "0")}`,
+      name: payload.name,
+      is_active: payload.is_active !== false,
+      institution_type: payload.institution_type ?? null,
+      category: payload.category ?? null,
+      division: payload.division ?? null,
+      district: payload.district ?? null,
+      taluk: payload.taluk ?? null,
+      constituency: payload.constituency ?? null,
+      hobli: payload.hobli ?? null,
+      academic_year: payload.academic_year ?? null,
+      institution_type_name: payload.institution_type_name ?? String(payload.institution_type ?? ""),
+      category_name: payload.category_name ?? String(payload.category ?? ""),
+      district_name: payload.district_name ?? String(payload.district ?? ""),
+      taluk_name: payload.taluk_name ?? String(payload.taluk ?? ""),
+      site_status: payload.site_status ?? "available",
+      site_details: payload.site_details ?? "",
+      student_capacity: payload.student_capacity ?? null,
+      source_file: "manual",
+      source_sheet: "—",
+      source_row: null,
+      raw_data: {},
+      updated_at: new Date().toISOString(),
+    } as Institution;
+    db.institutions.unshift(record);
+    return record;
+  },
+
+  async updateInstitution(id, payload) {
+    await delay(360);
+    const index = db.institutions.findIndex((i) => i.id === id);
+    if (index < 0) throw new ApiError("Institution not found.", 404);
+    const current = db.institutions[index] as Institution;
+    const updated = {
+      ...current,
+      ...payload,
+      institution_type_name: payload.institution_type_name ?? payload.institution_type ?? current.institution_type_name,
+      category_name: payload.category_name ?? payload.category ?? current.category_name,
+      district_name: payload.district_name ?? payload.district ?? current.district_name,
+      taluk_name: payload.taluk_name ?? payload.taluk ?? current.taluk_name,
+    } as Institution;
+    db.institutions[index] = updated;
+    return updated;
+  },
+
+  async deleteInstitution(id) {
+    await delay(300);
+    const found = db.institutions.find((i) => i.id === id);
+    if (!found) throw new ApiError("Institution not found.", 404);
+    found.is_active = false;
   },
 
   async listWorks(params) {
@@ -190,6 +338,10 @@ export const mockAdapter: ApiAdapter = {
         if (value) rows = rows.filter((r) => String(r[key] ?? "") === String(value));
       },
     );
+    if (params.is_active !== undefined && params.is_active !== "") {
+      const active = String(params.is_active) === "true";
+      rows = rows.filter((r) => (r.is_active !== false) === active);
+    }
     if (params.kkrdb !== undefined && params.kkrdb !== "")
       rows = rows.filter((r) => r.is_kkrdb === (String(params.kkrdb) === "true"));
     if (params.progress_min !== undefined && params.progress_min !== "")
@@ -215,6 +367,77 @@ export const mockAdapter: ApiAdapter = {
     const found = db.works.find((w) => w.id === id);
     if (!found) throw new ApiError("Work not found.", 404);
     return found;
+  },
+
+  async createWork(payload) {
+    await delay(400);
+    const record = {
+      id: Math.max(0, ...db.works.map((w) => w.id)) + 1,
+      code: payload.code || `WRK/${String(db.works.length + 1).padStart(5, "0")}`,
+      name: payload.name,
+      work_type: payload.work_type ?? "New school block",
+      institution: payload.institution ?? null,
+      category: payload.category ?? null,
+      district: payload.district ?? null,
+      taluk: payload.taluk ?? null,
+      constituency: payload.constituency ?? null,
+      academic_year: payload.academic_year ?? null,
+      scheme: payload.scheme ?? null,
+      agency: payload.agency ?? null,
+      status: payload.status ?? null,
+      district_name: payload.district_name ?? String(payload.district ?? ""),
+      taluk_name: payload.taluk_name ?? null,
+      category_name: payload.category_name ?? String(payload.category ?? ""),
+      status_name: payload.status_name ?? String(payload.status ?? ""),
+      approval_reference: payload.approval_reference ?? "",
+      contractor_name: payload.contractor_name ?? "",
+      estimate_amount_lakh: payload.estimate_amount_lakh ?? null,
+      contract_amount_lakh: payload.contract_amount_lakh ?? null,
+      revised_amount_lakh: payload.revised_amount_lakh ?? null,
+      financial_progress_lakh: payload.financial_progress_lakh ?? null,
+      physical_progress_percent: payload.physical_progress_percent ?? 0,
+      work_order_date: payload.work_order_date ?? null,
+      site_handover_date: payload.site_handover_date ?? null,
+      start_date: payload.start_date ?? null,
+      due_date: payload.due_date ?? null,
+      extension_date: payload.extension_date ?? null,
+      completion_date: payload.completion_date ?? null,
+      site_details: payload.site_details ?? "",
+      progress_details: payload.progress_details ?? "",
+      remarks: payload.remarks ?? "",
+      source_file: "manual",
+      source_sheet: "—",
+      source_row: null,
+      raw_data: {},
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    } as Work;
+    db.works.unshift(record);
+    return record;
+  },
+
+  async updateWork(id, payload) {
+    await delay(360);
+    const index = db.works.findIndex((w) => w.id === id);
+    if (index < 0) throw new ApiError("Work not found.", 404);
+    const current = db.works[index] as Work;
+    const updated = {
+      ...current,
+      ...payload,
+      district_name: payload.district_name ?? payload.district ?? current.district_name,
+      category_name: payload.category_name ?? payload.category ?? current.category_name,
+      status_name: payload.status_name ?? payload.status ?? current.status_name,
+      updated_at: new Date().toISOString(),
+    } as Work;
+    db.works[index] = updated;
+    return updated;
+  },
+
+  async deleteWork(id) {
+    await delay(300);
+    const found = db.works.find((w) => w.id === id);
+    if (!found) throw new ApiError("Work not found.", 404);
+    found.is_active = false;
   },
 
   async getDashboardSummary(params) {
@@ -269,7 +492,23 @@ export const mockAdapter: ApiAdapter = {
       site_problem_records: institutions.filter((i) => i.site_status === "problem").length,
     };
 
+    const site_snapshot = {
+      available: institutions.filter((i) => i.site_status === "available").length,
+      not_available: institutions.filter((i) => i.site_status === "not_available").length,
+      problem: institutions.filter((i) => i.site_status === "problem").length,
+    };
+
     return {
+      kpi_metrics: [
+        { key: "institutions", label: "Total Institutions", value: totals.institutions },
+        { key: "residential_schools", label: "Residential Schools", value: totals.residential_schools },
+        { key: "hostels", label: "Hostels", value: totals.hostels },
+        { key: "pu_colleges", label: "PU Colleges", value: totals.pu_colleges },
+        { key: "works", label: "Total Works", value: totals.works },
+        { key: "ongoing_works", label: "Ongoing Works", value: totals.ongoing_works },
+        { key: "completed_works", label: "Completed Works", value: totals.completed_works },
+        { key: "site_problem_records", label: "Site Problems", value: totals.site_problem_records },
+      ],
       totals,
       previous_period: {
         institutions: Math.round(totals.institutions * 0.94),
@@ -295,12 +534,64 @@ export const mockAdapter: ApiAdapter = {
           physical_progress: w.physical_progress,
           updated_at: w.updated_at,
         })),
-      site_snapshot: {
-        available: institutions.filter((i) => i.site_status === "available").length,
-        not_available: institutions.filter((i) => i.site_status === "not_available").length,
-        problem: institutions.filter((i) => i.site_status === "problem").length,
-      },
+      site_snapshot,
+      site_cards: [
+        { status: "available", label: "Site Available", count: site_snapshot.available },
+        { status: "not_available", label: "Site Not Available", count: site_snapshot.not_available },
+        { status: "problem", label: "Site Problems", count: site_snapshot.problem },
+      ],
     } satisfies DashboardSummary;
+  },
+
+  async getReport(slug, params) {
+    await delay(280);
+    const works = filterWorks(params ?? {});
+    return {
+      slug,
+      title: "KRICS Abstract Report",
+      title_kn: "ಕೃಷ್ಣಾ ಭವನ ನಿರ್ಮಾಣ ಸಂಸ್ಥೆ - ಅಮೂರ್ತ ವರದಿ",
+      subtitle: "Mock report (connect real API for live data)",
+      subtitle_kn: "",
+      generated_at: new Date().toISOString(),
+      group_by: String(params?.group_by || "district"),
+      group_by_options: [
+        { value: "district", label: "District", label_kn: "ಜಿಲ್ಲೆ" },
+        { value: "division", label: "Division", label_kn: "ವಿಭಾಗ" },
+        { value: "category", label: "Category", label_kn: "ವರ್ಗ" },
+      ],
+      filters_applied: [],
+      available_fields: [
+        { key: "group", label: "District", label_kn: "ಜಿಲ್ಲೆ", type: "text" },
+        { key: "works", label: "No. of Works", label_kn: "ಕಾಮಗಾರಿಗಳು", type: "number" },
+        { key: "estimate_lakh", label: "Estimate (Lakh)", label_kn: "ಅಂದಾಜು", type: "number" },
+      ],
+      columns: [
+        { key: "sl_no", label: "SI NO", label_kn: "ಕ್ರ.ಸಂ", type: "number" },
+        { key: "group", label: "District", label_kn: "ಜಿಲ್ಲೆ", type: "text" },
+        { key: "works", label: "No. of Works", label_kn: "ಕಾಮಗಾರಿಗಳು", type: "number" },
+        { key: "estimate_lakh", label: "Estimate (Lakh)", label_kn: "ಅಂದಾಜು", type: "number" },
+      ],
+      rows: [
+        { sl_no: 1, group: "Belagavi", works: works.length, estimate_lakh: sum(works.map((w) => w.estimate_amount_lakh ?? 0)) },
+      ],
+      totals: { works: works.length, estimate_lakh: sum(works.map((w) => w.estimate_amount_lakh ?? 0)) },
+      row_count: 1,
+    };
+  },
+
+  async exportReport(slug, format) {
+    await delay(200);
+    const blob = new Blob([`KRICS mock ${slug} ${format} export`], {
+      type: format === "excel" ? "application/vnd.ms-excel" : "application/msword",
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `KRICS_${slug}_mock.${format === "excel" ? "xlsx" : "docx"}`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
   },
 
   async getWorksSummary(params) {
@@ -491,6 +782,59 @@ export const mockAdapter: ApiAdapter = {
     if (params.row_number)
       rows = rows.filter((r) => String(r.row_number) === String(params.row_number));
     return paginate(rows, params);
+  },
+
+  async listMenus(params) {
+    await delay(160);
+    return accessStore.listMenus(params);
+  },
+  async createMenu(payload) {
+    await delay(180);
+    return accessStore.createMenu(payload);
+  },
+  async updateMenu(id, payload) {
+    await delay(180);
+    return accessStore.updateMenu(id, payload);
+  },
+  async deleteMenu(id) {
+    await delay(160);
+    accessStore.deleteMenu(id);
+  },
+  async listRoles(params) {
+    await delay(160);
+    return accessStore.listRoles(params);
+  },
+  async createRole(payload) {
+    await delay(180);
+    return accessStore.createRole(payload);
+  },
+  async updateRole(id, payload) {
+    await delay(180);
+    return accessStore.updateRole(id, payload);
+  },
+  async deleteRole(id) {
+    await delay(160);
+    accessStore.deleteRole(id);
+  },
+  async updateRoleAccess(id, access) {
+    await delay(180);
+    return accessStore.updateRoleAccess(id, access);
+  },
+  async listUsers(params) {
+    await delay(160);
+    return accessStore.listUsers(params);
+  },
+  async createUser(payload) {
+    await delay(180);
+    return accessStore.createUser(payload);
+  },
+  async updateUser(id, payload) {
+    await delay(180);
+    return accessStore.updateUser(id, payload);
+  },
+  async deleteUser(id) {
+    await delay(160);
+    accessStore.deleteUser(id);
   },
 };
 

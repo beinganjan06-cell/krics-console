@@ -8,6 +8,8 @@ export interface MasterRecord {
   /** Relational fields used by specific master resources. */
   district?: number | null;
   district_name?: string | null;
+  division?: number | null;
+  division_name?: string | null;
   taluk?: number | null;
   taluk_name?: string | null;
   reference_count?: number;
@@ -20,11 +22,32 @@ export type MasterResource =
   | "constituencies"
   | "hoblis"
   | "categories"
+  | "caste-categories"
   | "institution-types"
   | "agencies"
   | "schemes"
   | "academic-years"
   | "work-statuses";
+
+/** Django collection slug used by POST/GET /api/{slug} and related detail routes. */
+export const MASTER_API_SLUG: Record<MasterResource, string> = {
+  divisions: "division",
+  districts: "district",
+  taluks: "taluk",
+  constituencies: "constituency",
+  hoblis: "hobli",
+  categories: "caste-categories",
+  "caste-categories": "caste-categories",
+  "institution-types": "institution-types",
+  agencies: "agencies",
+  schemes: "schemes",
+  "academic-years": "academic-years",
+  "work-statuses": "work-statuses",
+};
+
+export function masterApiSlug(resource: MasterResource): string {
+  return MASTER_API_SLUG[resource];
+}
 
 export interface MasterPayload {
   name: string;
@@ -32,6 +55,7 @@ export interface MasterPayload {
   is_active: boolean;
   district?: number | null;
   taluk?: number | null;
+  division?: number | null;
 }
 
 export interface MasterResourceConfig {
@@ -39,7 +63,7 @@ export interface MasterResourceConfig {
   title: string;
   singular: string;
   description: string;
-  parent?: "district" | "taluk";
+  parent?: "division" | "district" | "taluk";
   parentRequired?: boolean;
 }
 
@@ -54,7 +78,8 @@ export const MASTER_RESOURCES: MasterResourceConfig[] = [
     resource: "districts",
     title: "Districts",
     singular: "District",
-    description: "Revenue districts of Karnataka covered by the society.",
+    description: "Revenue districts of Karnataka, mapped to a division.",
+    parent: "division",
   },
   {
     resource: "taluks",
@@ -80,9 +105,15 @@ export const MASTER_RESOURCES: MasterResourceConfig[] = [
   },
   {
     resource: "categories",
-    title: "Categories",
-    singular: "Category",
-    description: "Social welfare categories such as SC, ST, BC and General.",
+    title: "Caste Categories",
+    singular: "Caste category",
+    description: "Social welfare caste categories such as SC, ST, BC and General.",
+  },
+  {
+    resource: "caste-categories",
+    title: "Caste Categories",
+    singular: "Caste category",
+    description: "Social welfare caste categories such as SC, ST, BC and General.",
   },
   {
     resource: "institution-types",

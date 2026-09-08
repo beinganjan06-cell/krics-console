@@ -6,11 +6,15 @@ import {
   useRouter,
   HeadContent,
   Scripts,
+  isRedirect,
+  isNotFound,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { enforceAuth } from "@/lib/auth/guard";
+import { APP_NAME } from "@/lib/constants";
 
 function NotFoundComponent() {
   return (
@@ -35,6 +39,7 @@ function NotFoundComponent() {
 }
 
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+  if (isRedirect(error) || isNotFound(error)) throw error;
   console.error(error);
   const router = useRouter();
   useEffect(() => {
@@ -73,20 +78,25 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  beforeLoad: async ({ location }) => {
+    await enforceAuth(location.pathname);
+  },
   head: () => ({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: APP_NAME },
+      { name: "description", content: "Secure government operations portal for KRICS Works & Institutions." },
+      { name: "author", content: "KRICS" },
+      { property: "og:title", content: APP_NAME },
+      { property: "og:description", content: "Secure government operations portal for KRICS Works & Institutions." },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap",
+      },
       {
         rel: "stylesheet",
         href: appCss,

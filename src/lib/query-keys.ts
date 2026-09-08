@@ -1,0 +1,17 @@
+export const QK = {
+  masters: (resource: string, params?: object) => ["masters", resource, params ?? {}] as const,
+  master: (resource: string, id: number) => ["masters", resource, id] as const,
+  institutions: (params?: object) => ["institutions", params ?? {}] as const,
+  institution: (id: number) => ["institutions", id] as const,
+  works: (params?: object) => ["works", params ?? {}] as const,
+  work: (id: number) => ["works", id] as const,
+  batches: (params?: object) => ["import-batches", params ?? {}] as const,
+  audit: (params?: object) => ["import-audit", params ?? {}] as const,
+  dashboard: () => ["dashboard"] as const,
+  report: (slug: string, params?: object) => ["report", slug, params ?? {}] as const,
+  adminUsers: () => ["admin", "users"] as const,
+  adminRoles: () => ["admin", "roles"] as const,
+  adminMenus: () => ["admin", "menus"] as const,
+  adminAudit: (entity?: string) => ["admin", "audit", entity ?? "all"] as const,
+  adminSettings: () => ["admin", "settings"] as const,
+};

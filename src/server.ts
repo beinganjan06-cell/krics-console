@@ -1,5 +1,6 @@
 import "./lib/error-capture";
 
+import { isNotFound, isRedirect } from "@tanstack/react-router";
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
 
@@ -51,6 +52,8 @@ export default {
       const response = await handler.fetch(request, env, ctx);
       return await normalizeCatastrophicSsrResponse(response);
     } catch (error) {
+      if (isRedirect(error)) return error;
+      if (isNotFound(error) || error instanceof Response) throw error;
       console.error(error);
       return new Response(renderErrorPage(), {
         status: 500,
